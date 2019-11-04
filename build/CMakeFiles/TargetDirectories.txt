@@ -1,0 +1,6 @@
+/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build/CMakeFiles/rebuild_cache.dir
+/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build/CMakeFiles/wavcmp.dir
+/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build/CMakeFiles/edit_cache.dir
+/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build/CMakeFiles/wavquant.dir
+/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build/CMakeFiles/wavhist.dir
+/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build/CMakeFiles/wavcp.dir

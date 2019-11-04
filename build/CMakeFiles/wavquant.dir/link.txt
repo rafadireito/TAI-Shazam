@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/c++   -Wall -Wextra -I/usr/local/include -L/opt/local/lib -std=c++17 -O3 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/wavquant.dir/wavquant.cpp.o  -o ../bin-example/wavquant -lsndfile 
