@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "../bin-example/wavcp"
-  "../bin-example/wavcp.pdb"
+  "../executables/wavcp"
+  "../executables/wavcp.pdb"
   "CMakeFiles/wavcp.dir/wavcp.cpp.o"
 )
 

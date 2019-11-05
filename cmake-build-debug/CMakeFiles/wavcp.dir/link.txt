@@ -1,1 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/c++   -Wall -Wextra -I/usr/local/include -L/opt/local/lib s-std=c++17 -O3 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/wavcp.dir/wavcp.cpp.o  -o /Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/bin-example/wavcp -lsndfile 

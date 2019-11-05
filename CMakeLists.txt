@@ -8,7 +8,7 @@ SET (CMAKE_CXX_FLAGS_RELEASE "-O3")
 SET (CMAKE_CXX_FLAGS_DEBUG "-g3 -fsanitize=address")
 
 SET (BASE_DIR ${CMAKE_SOURCE_DIR} )
-SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BASE_DIR}/bin-example)
+SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BASE_DIR}/executables)
 
 add_executable (wavcp wavcp.cpp)
 target_link_libraries (wavcp sndfile)

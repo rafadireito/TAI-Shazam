@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "../bin-example/wavhist"
-  "../bin-example/wavhist.pdb"
+  "../executables/wavhist"
+  "../executables/wavhist.pdb"
   "CMakeFiles/wavhist.dir/wavhist.cpp.o"
 )
 

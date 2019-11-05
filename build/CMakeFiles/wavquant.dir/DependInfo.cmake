@@ -4,9 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/wavquant.cpp" "/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build/CMakeFiles/wavquant.dir/wavquant.cpp.o"
+  "/home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/wavquant.cpp" "/home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/build/CMakeFiles/wavquant.dir/wavquant.cpp.o"
   )
-set(CMAKE_CXX_COMPILER_ID "Clang")
+set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH

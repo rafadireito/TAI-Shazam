@@ -1,4 +1,0 @@
-/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/cmake-build-debug/CMakeFiles/wavhist.dir
-/Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/cmake-build-debug/CMakeFiles/wavcp.dir

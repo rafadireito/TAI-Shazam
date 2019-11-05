@@ -39,19 +39,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/Cellar/cmake/3.15.4/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/Cellar/cmake/3.15.4/bin/cmake -E remove -f
+RM = /usr/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example
+CMAKE_SOURCE_DIR = /home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build
+CMAKE_BINARY_DIR = /home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -59,7 +59,7 @@ CMAKE_BINARY_DIR = /Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/b
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/local/Cellar/cmake/3.15.4/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -70,7 +70,7 @@ rebuild_cache/fast: rebuild_cache
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/local/Cellar/cmake/3.15.4/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build/CMakeFiles /Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/build/CMakeFiles /home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rd/Desktop/UA/UA_7_Semestre/TAI/Projeto2/src-example/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -111,32 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named wavcmp
-
-# Build rule for target.
-wavcmp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 wavcmp
-.PHONY : wavcmp
-
-# fast build rule for target.
-wavcmp/fast:
-	$(MAKE) -f CMakeFiles/wavcmp.dir/build.make CMakeFiles/wavcmp.dir/build
-.PHONY : wavcmp/fast
-
-#=============================================================================
-# Target rules for targets named wavquant
-
-# Build rule for target.
-wavquant: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 wavquant
-.PHONY : wavquant
-
-# fast build rule for target.
-wavquant/fast:
-	$(MAKE) -f CMakeFiles/wavquant.dir/build.make CMakeFiles/wavquant.dir/build
-.PHONY : wavquant/fast
-
-#=============================================================================
 # Target rules for targets named wavhist
 
 # Build rule for target.
@@ -161,6 +135,32 @@ wavcp: cmake_check_build_system
 wavcp/fast:
 	$(MAKE) -f CMakeFiles/wavcp.dir/build.make CMakeFiles/wavcp.dir/build
 .PHONY : wavcp/fast
+
+#=============================================================================
+# Target rules for targets named wavquant
+
+# Build rule for target.
+wavquant: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 wavquant
+.PHONY : wavquant
+
+# fast build rule for target.
+wavquant/fast:
+	$(MAKE) -f CMakeFiles/wavquant.dir/build.make CMakeFiles/wavquant.dir/build
+.PHONY : wavquant/fast
+
+#=============================================================================
+# Target rules for targets named wavcmp
+
+# Build rule for target.
+wavcmp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 wavcmp
+.PHONY : wavcmp
+
+# fast build rule for target.
+wavcmp/fast:
+	$(MAKE) -f CMakeFiles/wavcmp.dir/build.make CMakeFiles/wavcmp.dir/build
+.PHONY : wavcmp/fast
 
 wavcmp.o: wavcmp.cpp.o
 
@@ -276,12 +276,12 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
-	@echo "... wavcmp"
-	@echo "... edit_cache"
-	@echo "... wavquant"
 	@echo "... wavhist"
 	@echo "... wavcp"
+	@echo "... rebuild_cache"
+	@echo "... wavquant"
+	@echo "... wavcmp"
+	@echo "... edit_cache"
 	@echo "... wavcmp.o"
 	@echo "... wavcmp.i"
 	@echo "... wavcmp.s"

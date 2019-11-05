@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "../bin-example/wavquant"
-  "../bin-example/wavquant.pdb"
+  "../executables/wavquant"
+  "../executables/wavquant.pdb"
   "CMakeFiles/wavquant.dir/wavquant.cpp.o"
 )
 
