@@ -1,0 +1,5 @@
+Audio com 8 bytes -> SNR=8.98835
+Audio com 6 bytes -> SNR=8.9003	
+Audio com 4 bytes -> SNR=7.70524
+Audio com 2 bytes -> SNR=0.592974
+Audio com 1 bytes -> SNR=-6.64677
