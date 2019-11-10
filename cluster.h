@@ -5,7 +5,7 @@ class Cluster{
     private:
         std::vector<short> centroid;
 
-        std::vector<Point> points;
+        std::vector<size_t> points;
 
         size_t clusterId;
         
@@ -20,23 +20,22 @@ class Cluster{
 
             }
 
-            this->addPoint(centroid);
+            this->addPoint(centroid.getId());
         }
 
-        void addPoint(Point p){
-            p.setClusterId(this->clusterId);
-
-            points.push_back(p);
+        void addPoint(size_t pointId){
+            points.push_back(pointId);
         }
 
-        bool removePoint(Point p){
-            size_t nPoints = points.size();
+        bool removePoint(size_t pointId){
 
-            for(size_t i = 0; i < nPoints; i++){
-                if(points[i].getPointId() == p.getPointId()){
+            for(size_t i = 0; i < points.size(); i++){
+
+                if(points[i] == pointId){
                     points.erase(points.begin() + i);
                     return true;
                 }
+
             }
 
             return false;
@@ -46,7 +45,7 @@ class Cluster{
             return clusterId;
         }
 
-        Point getPoint(size_t pos){
+        size_t getPoint(size_t pos){
             return points[pos];
         }
         
@@ -62,7 +61,7 @@ class Cluster{
             this->centroid[pos] = val;
         }
 
-        size_t getSize(){
+        size_t getClusterSize(){
             return points.size();
         }
 };

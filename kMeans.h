@@ -2,18 +2,23 @@
 #include <algorithm>
 
 class KMeans{
-    std::vector<Cluster> clusters;
-    size_t sampleSize, k;
-    int iterations;
+
 
     private:
+        std::vector<Cluster> clusters;
+        std::vector<Point> points; 
+        size_t sampleSize, k;
+        int iterations;
+
         size_t getNearestClusterId(Point p){
 
             double min_dist, sum = 0.0, dist;
             
             
             for(size_t i = 0; i < sampleSize; i++){
+
                 sum += pow(clusters[0].getCentroidByPos(i) - p.getSampleValue(i), 2.0);
+            
             }
             
             min_dist = sqrt(sum);
@@ -43,7 +48,7 @@ class KMeans{
         void updateCentroids(){
 
             for(size_t i = 0; i < k; i++){
-                size_t ClusterSize = clusters[i].getSize();
+                size_t ClusterSize = clusters[i].getClusterSize();
                 
                 for(size_t j = 0; j < sampleSize; j++){
                     
@@ -53,7 +58,7 @@ class KMeans{
                         
                         for(size_t p = 0; p < ClusterSize; p++){
 
-                            sum += clusters[i].getPoint(p).getSampleValue(j);
+                            sum += points[clusters[i].getPoint(p)].getSampleValue(j);
                             
                         }
 
@@ -69,19 +74,13 @@ class KMeans{
             this->iterations = iterations;
         }       
 
-
-
-
         std::vector<std::vector<short>> getKMeansClustering(std::vector<std::vector<short>> samples){
-            size_t nSamples = samples.size();
 
             sampleSize = samples[0].size();
 
-            std::vector<Point> all_points;
-
-            for(size_t i = 0; i < nSamples; i++){
+            for(size_t i = 0; i < samples.size(); i++){
                 Point p(samples[i], i);
-                all_points.push_back(p);
+                points.push_back(p);
             }
 
             /*
@@ -97,16 +96,18 @@ class KMeans{
 
             for(size_t i = 1; i <= k; i++){
                 while(true){
-                    size_t randInd = rand() % nSamples;
+                    size_t randInd = rand() % points.size();
                     
                     if(std::find(usedPoints.begin(), usedPoints.end(), randInd) == usedPoints.end()){
 
                         usedPoints.push_back(randInd);
                     
-                        all_points[randInd].setClusterId(i);
+                        points[randInd].setClusterId(i);
 
-                        Cluster c(all_points[randInd], i);
+                        Cluster c(points[randInd], i);
                         
+                        points[randInd].setClusterId(i);
+
                         clusters.push_back(c);
 
                         break;
@@ -126,16 +127,18 @@ class KMeans{
                   Atualiza as atribuições dos pontos aos clusters
                 */
                 std::cout << "Atribute Clusters" << std::endl;
-                for(size_t i = 0; i < nSamples; i++){
 
-                    size_t newClusterId = this->getNearestClusterId(all_points[i]);
-                    size_t previousClusterId = all_points[i].getClusterId();
+                for(size_t i = 0; i < points.size(); i++){
 
+                    size_t newClusterId = this->getNearestClusterId(points[i]);
+                    size_t previousClusterId = points[i].getClusterId();
+                    
                     if(newClusterId != previousClusterId){
                         if(previousClusterId != 0){
                             for(size_t j = 0; j < k; j++){
+
                                 if(clusters[j].getId() == previousClusterId){
-                                    clusters[j].removePoint(all_points[i]) ;
+                                    clusters[j].removePoint(i) ;
                                 }
                             }
                         }
@@ -143,8 +146,8 @@ class KMeans{
                         for(size_t j = 0; j < k; j++){
                             if(clusters[j].getId() == newClusterId){
 
-                                clusters[j].addPoint(all_points[i]);
-                                all_points[i].setClusterId(newClusterId);
+                                clusters[j].addPoint(i);
+                                points[i].setClusterId(newClusterId);
                             }
                         } 
 

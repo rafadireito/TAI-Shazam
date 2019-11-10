@@ -27,7 +27,7 @@ class Point {
             clusterId = index;
         }
 
-        size_t getPointId(){
+        size_t getId(){
             return pointId;
         }
 
