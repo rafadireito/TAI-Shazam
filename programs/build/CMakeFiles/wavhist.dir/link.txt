@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wall -Wextra -I/usr/local/include -L/opt/local/lib -std=c++17 -O3  -rdynamic CMakeFiles/wavhist.dir/wavhist.cpp.o  -o ../executables/wavhist -lsndfile 

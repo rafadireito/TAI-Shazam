@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/programs/wavcmp.cpp
+iostream
+-
+vector
+-
+sndfile.hh
+-
+math.h
+-
+
