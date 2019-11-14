@@ -1,7 +1,0 @@
-/home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/programs/build/CMakeFiles/edit_cache.dir
-/home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/programs/build/CMakeFiles/wavhist.dir
-/home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/programs/build/CMakeFiles/wavcp.dir
-/home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/programs/build/CMakeFiles/rebuild_cache.dir
-/home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/programs/build/CMakeFiles/wavquant.dir
-/home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/programs/build/CMakeFiles/wavcb.dir
-/home/user/Desktop/ZiTh0s/docs/uni/TAI/projeto2/git/TAI-Shazam/programs/build/CMakeFiles/wavcmp.dir
