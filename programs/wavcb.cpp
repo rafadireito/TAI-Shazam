@@ -11,7 +11,7 @@ using namespace std;
 
 void fileWriter(string name, std::vector<std::vector<short>> codebook){
     ofstream fp;
-    fp.open(name.substr(0, name.length() -3) + "codeboke");
+    fp.open(name.substr(0, name.length() -3) + "codebook");
     for(size_t i = 0; i < codebook.size(); i++){
         for(size_t j = 0; j < codebook[i].size(); j++){
             fp << codebook[i][j] << " ";
