@@ -33,8 +33,15 @@ bool is_number(std::string s)
 
 int main(int argc, char *argv[]) {
 
-    if(argc < 2) {
-        std::cerr << "Usage: wavcp <input file>" << std::endl;
+    if(argc < 3) {
+        std::cerr << "Usage: wavcp [options]" << std::endl;
+        std::cerr << "-f 'filename'" << std::endl;
+        std::cerr << "-d 'directory" << std::endl;
+        std::cerr << "-b block size" << std::endl;
+        std::cerr << "-o overlaping factor" << std::endl;
+        std::cerr << "-c codebook size" << std::endl;
+        std::cerr << "-i max iterations in Kmeans" << std::endl;
+        std::cerr << "Use at least -f or -d options" << std::endl;
         return 1; 
     }
 
