@@ -14,9 +14,9 @@ class Cluster{
         Cluster( Point centroid, size_t clusterId){
             this->clusterId = clusterId;
 
-            for(size_t i=0; i < centroid.getSampleSize(); i++){
+            for(size_t i=0; i < centroid.getBlockSize(); i++){
 
-                this->centroid.push_back(centroid.getSampleValue(i));
+                this->centroid.push_back(centroid.getBlockByValue(i));
 
             }
 
@@ -45,7 +45,7 @@ class Cluster{
             return clusterId;
         }
 
-        size_t getPoint(size_t pos){
+        size_t getBlock(size_t pos){
             return points[pos];
         }
         
@@ -61,7 +61,7 @@ class Cluster{
             this->centroid[pos] = val;
         }
 
-        size_t getClusterSize(){
+        size_t getNBlocks(){
             return points.size();
         }
 };

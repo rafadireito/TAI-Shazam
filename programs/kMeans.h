@@ -7,7 +7,7 @@ class KMeans{
     private:
         std::vector<Cluster> clusters;
         std::vector<Point> points; 
-        size_t sampleSize, k;
+        size_t blockSize, k;
         int iterations;
 
         size_t getNearestClusterId(Point p){
@@ -15,9 +15,9 @@ class KMeans{
             double min_dist, sum = 0.0, dist;
             
             
-            for(size_t i = 0; i < sampleSize; i++){
+            for(size_t i = 0; i < blockSize; i++){
 
-                sum += pow(clusters[0].getCentroidByPos(i) - p.getSampleValue(i), 2.0);
+                sum += pow(clusters[0].getCentroidByPos(i) - p.getBlockByValue(i), 2.0);
             
             }
             
@@ -29,9 +29,9 @@ class KMeans{
                 
                 sum = 0.0;
                 
-                for(size_t j = 0; j < sampleSize; j++){
+                for(size_t j = 0; j < blockSize; j++){
                     
-                    sum += pow(clusters[i].getCentroidByPos(i) - p.getSampleValue(i), 2);
+                    sum += pow(clusters[i].getCentroidByPos(i) - p.getBlockByValue(i), 2);
                 }
 
                 dist = sqrt(sum);
@@ -47,22 +47,23 @@ class KMeans{
 
         void updateCentroids(){
 
-            for(size_t i = 0; i < k; i++){
-                size_t ClusterSize = clusters[i].getClusterSize();
+            for(size_t cluster = 0; cluster < k; cluster++){
+
+                size_t clusterNBlocks = clusters[cluster].getNBlocks();
                 
-                for(size_t j = 0; j < sampleSize; j++){
+                for(size_t value = 0; value < blockSize; value++){
                     
                     double sum = 0.0;
 
-                    if(ClusterSize > 0){
+                    if(clusterNBlocks > 0){
                         
-                        for(size_t p = 0; p < ClusterSize; p++){
+                        for(size_t block = 0; block < clusterNBlocks; block++){
 
-                            sum += points[clusters[i].getPoint(p)].getSampleValue(j);
+                            sum += points[clusters[cluster].getBlock(block)].getBlockByValue(value);
                             
                         }
 
-                        clusters[i].setCentroidByPos(j, sum / ClusterSize);
+                        clusters[cluster].setCentroidByPos(value, sum / clusterNBlocks);
                     }
                 }
             }
@@ -74,12 +75,12 @@ class KMeans{
             this->iterations = iterations;
         }       
 
-        std::vector<std::vector<short>> getKMeansClustering(std::vector<std::vector<short>> samples){
+        std::vector<std::vector<short>> getClusters(std::vector<std::vector<short>> blocks){
 
-            sampleSize = samples[0].size();
+            blockSize = blocks[0].size();
 
-            for(size_t i = 0; i < samples.size(); i++){
-                Point p(samples[i], i);
+            for(size_t i = 0; i < blocks.size(); i++){
+                Point p(blocks[i], i);
                 points.push_back(p);
             }
 

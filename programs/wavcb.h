@@ -1,5 +1,3 @@
-
-
 #include <sndfile.hh>
 #include <vector>
 #include <math.h>
@@ -11,25 +9,31 @@ class WAVCb {
 
     public:
 
-        std::vector<std::vector<short>> getCodebook(SndfileHandle& wavFile, size_t windowSize, size_t offset, size_t codebookSize){
-            std::vector<std::vector<short>> samples;
+        std::vector<std::vector<short>> getCodebook(SndfileHandle& wavFile, size_t blockSize, size_t overlappingFactor, size_t codebookSize, int maxIterations){
+            std::vector<std::vector<short>> blocks;
 
-            size_t nFrames;
-            std::vector<short> sample(windowSize * wavFile.channels());
-            while((nFrames = wavFile.readf(sample.data(), windowSize))){
+            size_t readBlockSize;
+
+            std::vector<short> block(blockSize * wavFile.channels());
+
+            while((readBlockSize = wavFile.readf(block.data(), blockSize))){
                 
-                if(nFrames == windowSize){
+                if(readBlockSize == blockSize){
                 
-                    samples.push_back(sample);
-                    wavFile.seek( -offset, SEEK_CUR);                               
+                    blocks.push_back(block);
+                    wavFile.seek( -overlappingFactor, SEEK_CUR);                               
                 
                 }
             
             }
-            std::cout << samples.size()/150 << std::endl;
+            if(blockSize < codebookSize){
+                std::cerr << "Error: codebook size larger than extracted blocks." << std::endl;
+                std::cerr << "Use a smaller codebookSize or extract more blocks ( > overlaping or < block size)" << std::endl;
+                return std::vector<std::vector<short>>();                
+            }
 
-            KMeans km(samples.size()/100, 500);
+            KMeans km(codebookSize, maxIterations);
 
-            return km.getKMeansClustering(samples);
+            return km.getClusters(blocks);
         }
  };

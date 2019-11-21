@@ -6,14 +6,14 @@
 class Point {
 
     private:
-        std::vector<short> sample;
+        std::vector<short> block;
 
         size_t clusterId, pointId;
 
     public:
         
-        Point(std::vector<short> sample, size_t id){
-            this->sample = sample;
+        Point(std::vector<short> block, size_t id){
+            this->block = block;
             pointId = id;
             clusterId = 0;
 
@@ -31,15 +31,15 @@ class Point {
             return pointId;
         }
 
-        size_t getSampleSize(){
-            return sample.size();
+        size_t getBlockSize(){
+            return block.size();
         }
 
-        short getSampleValue(size_t pos){
-            return sample[pos];
+        short getBlockByValue(size_t pos){
+            return block[pos];
         }
 
-        std::vector<short> getSample(){
-            return sample;
+        std::vector<short> getBlock(){
+            return block;
         }
 };
