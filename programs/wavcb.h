@@ -9,7 +9,7 @@ class WAVCb {
 
     public:
 
-        std::vector<std::vector<short>> getCodebook(SndfileHandle& wavFile, size_t blockSize, size_t overlappingFactor, size_t codebookSize, int maxIterations){
+        std::vector<std::vector<short>> getCodebook(SndfileHandle& wavFile, size_t blockSize, size_t overlappingFactor, size_t codebookSize, int maxIterations, int nThreads){
             std::vector<std::vector<short>> blocks;
 
             size_t readBlockSize;
@@ -34,6 +34,6 @@ class WAVCb {
 
             KMeans km(codebookSize, maxIterations);
 
-            return km.getClusters(blocks);
+            return km.getClusters(blocks, nThreads);
         }
  };

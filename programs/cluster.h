@@ -1,5 +1,6 @@
 #include "point.h"
 
+
 class Cluster{
 
     private:

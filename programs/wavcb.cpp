@@ -41,7 +41,8 @@ int main(int argc, char *argv[]) {
         std::cerr << "-o overlaping factor" << std::endl;
         std::cerr << "-c codebook size" << std::endl;
         std::cerr << "-i max iterations in Kmeans" << std::endl;
-        std::cerr << "Use at least -f or -d options" << std::endl;
+        std::cerr << "-t number of threads" << std::endl;
+        std::cerr << "Use at least -f or -d options" << std::endl;    
         return 1; 
     }
 
@@ -51,7 +52,8 @@ int main(int argc, char *argv[]) {
     size_t blockSize = 5000;
     float overlappingFactor = 0.5;
     size_t codebookSize = 150;
-    int iterations = 100; 
+    int iterations = 100;
+    int nThreads = 4;
 
     for(int i = 1; i < argc; i++){
         
@@ -96,6 +98,13 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
         }
+        else if(strcmp("-t", argv[i]) == 0 ){
+            nThreads = std::atoi( argv[i+1] );
+            if(nThreads <= 0){
+                std::cerr << "Error: invalid number of threads" << std::endl;
+                return 1;
+            }
+        }
         else{
             std::cerr << "Error: Invalid Use of Arguments" << std::endl;
             return 1;
@@ -121,7 +130,8 @@ int main(int argc, char *argv[]) {
                 blockSize, 
                 blockSize*overlappingFactor, 
                 codebookSize, 
-                iterations);
+                iterations,
+                nThreads);
 
         if(codebook.size() == 0){
             return 1;
@@ -154,7 +164,8 @@ int main(int argc, char *argv[]) {
                             blockSize, 
                             blockSize*overlappingFactor, 
                             codebookSize, 
-                            iterations);
+                            iterations,
+                            nThreads);
                     if(codebook.size() == 0){
                         return 1;
                     }

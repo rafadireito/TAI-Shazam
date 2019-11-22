@@ -1,5 +1,13 @@
 #include "cluster.h"
 #include <algorithm>
+#include <thread>
+#include <pthread.h>
+#include <mutex>
+
+struct updateData {
+   size_t start;
+   size_t end;
+};
 
 class KMeans{
 
@@ -9,45 +17,70 @@ class KMeans{
         std::vector<Point> points; 
         size_t blockSize, k;
         int iterations;
+        bool done;
+        std::mutex m;
+    
+    public:
+        void updateNearestCluster(size_t start, size_t end){
 
-        size_t getNearestClusterId(Point p){
+            for(size_t point = start; point < end; point++){
 
-            double min_dist, sum = 0.0, dist;
-            
-            
-            for(size_t i = 0; i < blockSize; i++){
-
-                sum += pow(clusters[0].getCentroidByPos(i) - p.getBlockByValue(i), 2.0);
-            
-            }
-            
-            min_dist = sqrt(sum);
-            size_t nearestClusterId = clusters[0].getId();
-
-            
-            for(size_t i = 1; i < k; i ++){
+                double min_dist, sum = 0.0, dist;
                 
-                sum = 0.0;
+                for(size_t position = 0; position < blockSize; position++){
+
+                    sum += pow(clusters[0].getCentroidByPos(position) - points[point].getBlockByValue(position), 2.0);
                 
-                for(size_t j = 0; j < blockSize; j++){
+                }
+                min_dist = sqrt(sum);
+                size_t nearestClusterId = clusters[0].getId();
+
+                for(size_t cluster = 1; cluster < k; cluster ++){
                     
-                    sum += pow(clusters[i].getCentroidByPos(i) - p.getBlockByValue(i), 2);
-                }
+                    sum = 0.0;
+                    
+                    for(size_t position = 0; position < blockSize; position++){
+                        
+                        sum += pow(clusters[cluster].getCentroidByPos(position) - points[point].getBlockByValue(position), 2);
+                    }
 
-                dist = sqrt(sum);
-                
-                if(dist < min_dist){
-                    min_dist = dist;
-                    nearestClusterId = clusters[i].getId();
+                    dist = sqrt(sum);
+                    
+                    if(dist < min_dist){
+                        min_dist = dist;
+                        nearestClusterId = clusters[cluster].getId();
+                    }
                 }
-            }
+                size_t previousClusterId = points[point].getClusterId();
+                    
+                if(nearestClusterId != previousClusterId){
+                    if(previousClusterId != 0){
+                        for(size_t cluster = 0; cluster < k; cluster++){
+                            if(clusters[cluster].getId() == previousClusterId){
+                                m.lock();
+                                clusters[cluster].removePoint(point) ;
+                                m.unlock();
+                            }
+                        }
+                    }
 
-            return nearestClusterId;
+                    for(size_t cluster = 0; cluster < k; cluster++){
+                        if(clusters[cluster].getId() == nearestClusterId){
+                            m.lock();
+                            clusters[cluster].addPoint(point);
+                            m.unlock();
+                            points[point].setClusterId(nearestClusterId);
+                            
+                        }
+                    } 
+                    this->done = false;
+                }
+            };
         }
 
-        void updateCentroids(){
+        void updateCentroids(size_t start, size_t end){
 
-            for(size_t cluster = 0; cluster < k; cluster++){
+            for(size_t cluster = start; cluster < end; cluster++){
 
                 size_t clusterNBlocks = clusters[cluster].getNBlocks();
                 
@@ -69,13 +102,14 @@ class KMeans{
             }
         }
 
-    public:
         KMeans(size_t k, int iterations){
             this->k = k;
             this->iterations = iterations;
         }       
 
-        std::vector<std::vector<short>> getClusters(std::vector<std::vector<short>> blocks){
+        std::vector<std::vector<short>> getClusters(std::vector<std::vector<short>> blocks, int nThreads){
+            
+            std::thread threads[nThreads];    
 
             blockSize = blocks[0].size();
 
@@ -120,40 +154,32 @@ class KMeans{
             std::cout << "Clusters Initialized" << std::endl;
             
             int iter = 0;
+            int pointsStep = points.size() / nThreads;
+            int clustersStep = k / nThreads;
 
             while(true){
-                bool done = true;
+                done = true;
 
                 /*
                   Atualiza as atribuições dos pontos aos clusters
                 */
                 std::cout << "Atribute Clusters" << std::endl;
 
-                for(size_t i = 0; i < points.size(); i++){
+                for(int i = 0; i < nThreads; i++){
 
-                    size_t newClusterId = this->getNearestClusterId(points[i]);
-                    size_t previousClusterId = points[i].getClusterId();
-                    
-                    if(newClusterId != previousClusterId){
-                        if(previousClusterId != 0){
-                            for(size_t j = 0; j < k; j++){
-
-                                if(clusters[j].getId() == previousClusterId){
-                                    clusters[j].removePoint(i) ;
-                                }
-                            }
-                        }
-
-                        for(size_t j = 0; j < k; j++){
-                            if(clusters[j].getId() == newClusterId){
-
-                                clusters[j].addPoint(i);
-                                points[i].setClusterId(newClusterId);
-                            }
-                        } 
-
-                        done = false;
+                    if(i == nThreads -1){
+                        size_t start = i*pointsStep;
+                        size_t end = points.size();
+                        threads[i] = std::thread(&KMeans::updateNearestCluster, this, start, end);
                     }
+                    else{
+                        size_t start = i*pointsStep;
+                        size_t end = i*pointsStep + pointsStep;
+                        threads[i] = std::thread(&KMeans::updateNearestCluster, this, start, end);
+                    }
+                }
+                for(int i = 0; i < nThreads; i++){
+                    threads[i].join();
                 }
 
 
@@ -161,7 +187,21 @@ class KMeans{
                   Atualizar os centroids de acordo com as novas atribuições.
                 */
                 std::cout << "Update Centroids" << std::endl;
-                updateCentroids();
+                for(int i = 0; i < nThreads; i++){
+                    if(i == nThreads -1){
+                        size_t start = i*clustersStep;
+                        size_t end = clusters.size();
+                        threads[i] = std::thread(&KMeans::updateCentroids, this, start, end);
+                    }
+                    else{
+                        size_t start = i*clustersStep;
+                        size_t end = i*clustersStep + clustersStep;
+                        threads[i] = std::thread(&KMeans::updateCentroids, this, start, end);
+                    }
+                }
+                for(int i = 0; i < nThreads; i++){
+                    threads[i].join();
+                }
 
                 if(done || iter > iterations){
                     std::cout << "Finished KMeans" << std::endl;
@@ -173,7 +213,6 @@ class KMeans{
             for(size_t i = 0; i < k; i++){
                 centroids.push_back(clusters[i].getCentroid());
             }
-            
             return centroids;
         }
 };
