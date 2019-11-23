@@ -9,8 +9,8 @@ Wavfind::Wavfind() = default;
 Wavfind::~Wavfind() = default;
 
 void Wavfind::compare(std::string codebookName, double result) {
-    if (this -> probability < result) {
-        this -> probability = result;
+    if (this -> signalNoiseRatio > result) {
+        this -> signalNoiseRatio = result;
         this -> probableCodebook = std::move(codebookName);
     }
 }
@@ -88,12 +88,13 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    size_t blockSize = 5000;
+    float overlappingFactor = 0.5;
     Wavfind wf;
     Wavcmp wc;
-    double result;
 
     std::vector<std::string> files = wf.open(argv[argc-2]);
-    files.erase(files.begin(), files.begin()+3);
+    files.erase(files.begin(), files.begin()+2);
 
     SndfileHandle sampleFile { argv[argc-1] };
 
@@ -112,36 +113,33 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    std::vector<short> sample = wc.allSampleFromFile(sampleFile);
-
     for (const auto & file : files) {
-        SndfileHandle sndFile { argv[argc-2] + file };
+        double result = 0;
+        double numBlocks = 0;
+        size_t readBlockSize = 0;
+        std::string line;
+        std::ifstream codebook (argv[argc-2] + file);
+        sampleFile.seek(0, SEEK_SET);
 
-        if(sndFile.error()) {
-	        std::cerr << "Error: invalid input file" << std::endl;
-    	    return 1;
+        if (codebook.is_open()) {
+            while (getline(codebook, line)) {
+                std::vector<short> codebookSample (line.begin(), line.end());
+                std::vector<short> block(blockSize * sampleFile.channels());
+
+                while((readBlockSize = sampleFile.readf(block.data(), blockSize))) {
+                    if(readBlockSize == blockSize) {
+                        numBlocks += 1;
+                        result += wc.signalNoiseRatio(wc.signalEnergy(block), wc.noiseEnergy(block, codebookSample));
+                        sampleFile.seek( -overlappingFactor, SEEK_CUR);
+                    }
+                }
+            }
+
+            codebook.close();
+            wf.compare(file, result / numBlocks);
         }
-
-        if((sndFile.format() & SF_FORMAT_TYPEMASK) != SF_FORMAT_WAV) {
-	        std::cerr << "Error: file is not in WAV format" << std::endl;
-    	    return 1;
-        }
-
-        if((sndFile.format() & SF_FORMAT_SUBMASK) != SF_FORMAT_PCM_16) {
-            std::cerr << "Error: file is not in PCM_16 format" << std::endl;
-            return 1;
-        }
-
-        std::vector<short> codebook = wc.allSampleFromFile(sndFile);
-
-        if(codebook.size() != sample.size()){
-            std::cerr << "Files have different sizes" << std::endl;
-            return 1;
-        }
-
-        result = wc.signalNoiseRatio(wc.signalEnergy(codebook), wc.noiseEnergy(sample, codebook));
-        wf.compare(file, result);
     }
 
     std::cout << "I think this is your song: " << wf.guessMusic() << std::endl;
+    return 0;
 }

@@ -15,7 +15,7 @@
 class Wavfind {
 private:
     std::string probableCodebook;
-    double probability{};
+    double signalNoiseRatio{};
 public:
     ~Wavfind();
 
