@@ -16,8 +16,15 @@ class KMeans{
         std::mutex m;
     
     public:
-        void updateNearestCluster(size_t start, size_t end){
 
+        /*
+            Dado uma posição de ínicio e uma de fim calcula
+            os clusters a que os pontos nessa gama pretencem.
+        */
+        void updateNearestCluster(size_t start, size_t end){
+            /*
+               Calcula a distância a todos os centroids
+            */
             for(size_t point = start; point < end; point++){
 
                 double min_dist, sum = 0.0, dist;
@@ -47,7 +54,10 @@ class KMeans{
                     }
                 }
                 size_t previousClusterId = points[point].getClusterId();
-                    
+                /*
+                    Verifica se o ponto mudou de cluster, se o fez tem de atualizar o clusterId no ponto
+                    e alterar também o array de pontos nos dois clusters.
+                */
                 if(nearestClusterId != previousClusterId){
                     if(previousClusterId != 0){
                         for(size_t cluster = 0; cluster < k; cluster++){
@@ -68,13 +78,24 @@ class KMeans{
                             
                         }
                     } 
+                    /*
+                      Indica que houve uma alteração de cluster
+                    */
                     this->done = false;
                 }
             };
         }
 
+        /*
+          Dado um ponto de ínicio e um de fim atualiza todos os centroids
+          presentes nessa gama.
+        */
         void updateCentroids(size_t start, size_t end){
 
+            /*
+              Para cada cluster, vai pegar em todos os pontos que lhe pertencem e
+              calcular a média da distância em cada entrada dele.
+            */
             for(size_t cluster = start; cluster < end; cluster++){
 
                 size_t clusterNBlocks = clusters[cluster].getNBlocks();
@@ -107,6 +128,9 @@ class KMeans{
             std::thread threads[nThreads];    
 
             blockSize = blocks[0].size();
+            /*
+              Adiciona os blocos como sendo pontos
+            */
 
             for(size_t i = 0; i < blocks.size(); i++){
                 Point p(blocks[i], i);
@@ -114,10 +138,9 @@ class KMeans{
             }
 
             /*
-              Initializing Clusters.
+              Inicializa os Clusters.
             */
 
-            std::cout << "Initializing Clusters" << std::endl;
             
             srand(time(NULL));
 
@@ -146,7 +169,6 @@ class KMeans{
                 }
             }
 
-            std::cout << "Clusters Initialized" << std::endl;
             
             int iter = 0;
             int pointsStep = points.size() / nThreads;
@@ -158,7 +180,6 @@ class KMeans{
                 /*
                   Atualiza as atribuições dos pontos aos clusters
                 */
-                std::cout << "Atribute Clusters" << std::endl;
 
                 for(int i = 0; i < nThreads; i++){
 
@@ -181,7 +202,6 @@ class KMeans{
                 /*
                   Atualizar os centroids de acordo com as novas atribuições.
                 */
-                std::cout << "Update Centroids" << std::endl;
                 for(int i = 0; i < nThreads; i++){
                     if(i == nThreads -1){
                         size_t start = i*clustersStep;
@@ -199,7 +219,6 @@ class KMeans{
                 }
 
                 if(done || iter > iterations){
-                    std::cout << "Finished KMeans" << std::endl;
                     break;
                 }
                 iter ++;

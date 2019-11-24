@@ -5,6 +5,7 @@
 #include "wavcb.h"
 #include <filesystem>
 #include <fstream>
+#include <chrono>
 
 using namespace std;
 
@@ -33,7 +34,7 @@ bool is_number(std::string s)
 
 int main(int argc, char *argv[]) {
 
-    if(argc < 3) {
+    if(argc < 5) {
         std::cerr << "Usage: wavcp [options]" << std::endl;
         std::cerr << "-f 'filename'" << std::endl;
         std::cerr << "-d 'directory" << std::endl;
@@ -42,12 +43,14 @@ int main(int argc, char *argv[]) {
         std::cerr << "-c codebook size" << std::endl;
         std::cerr << "-i max iterations in Kmeans" << std::endl;
         std::cerr << "-t number of threads" << std::endl;
+        std::cerr << "-w outputfile (if using -f) or outputpath (if using -d)" << std::endl;
         std::cerr << "Use at least -f or -d options" << std::endl;    
         return 1; 
     }
 
     string directory = "";
     string file = "";
+    string output = "";
 
     size_t blockSize = 5000;
     float overlappingFactor = 0.5;
@@ -105,6 +108,9 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
         }
+        else if(strcmp("-w", argv[i]) == 0 ){
+            output = argv[i+1];
+        }
         else{
             std::cerr << "Error: Invalid Use of Arguments" << std::endl;
             return 1;
@@ -112,7 +118,14 @@ int main(int argc, char *argv[]) {
         i += 1;
     } 
 
+    if(output.compare("") == 0){
+        std::cerr << "Error: invalid output file/path" << std::endl;
+    }
+
     if( file.compare("") != 0 && directory.compare("") == 0){
+
+        std::cout << "Doing the codebook of the file: " << file << std::endl;
+        auto start = std::chrono::high_resolution_clock::now(); 
 
         SndfileHandle sndFileIn { file }; 
         if(sndFileIn.error()) {
@@ -137,7 +150,12 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-        fileWriter(file, codebook);
+        auto stop = std::chrono::high_resolution_clock::now();
+
+        fileWriter(output, codebook);
+        
+        auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start); 
+        std::cout << "Codebook finished in: " << duration.count()  << " seconds." << std::endl;
     }
     else if( file.compare("") == 0 && directory.compare("") != 0){
         
@@ -148,6 +166,9 @@ int main(int argc, char *argv[]) {
 
                 if(file.compare(file.length()-4, 4, ".wav") == 0){
                     
+                    std::cout << "Doing the codebook of the file: " << entry.path().filename() << std::endl;
+                    auto start = std::chrono::high_resolution_clock::now(); 
+
                     SndfileHandle sndFileIn { file }; 
                     if(sndFileIn.error()) {
                         std::cerr << "Error: invalid input file" << std::endl;
@@ -170,8 +191,12 @@ int main(int argc, char *argv[]) {
                         return 1;
                     }
 
+                    auto stop = std::chrono::high_resolution_clock::now();
 
-                    fileWriter(entry.path().filename(), codebook);
+                    fileWriter(output + (string)entry.path().filename(), codebook);
+                    
+                    auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start); 
+                    std::cout << "Codebook finished in: " << duration.count()  << " seconds." << std::endl;
                 }
             }
         }

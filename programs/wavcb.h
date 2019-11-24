@@ -16,6 +16,9 @@ class WAVCb {
 
             std::vector<short> block(blockSize * wavFile.channels());
 
+            /*
+              Lê o ficheiro e depois retrocede o valor do overlapping
+            */
             while((readBlockSize = wavFile.readf(block.data(), blockSize))){
                 
                 if(readBlockSize == blockSize){
@@ -31,7 +34,9 @@ class WAVCb {
                 std::cerr << "Use a smaller codebookSize or extract more blocks ( > overlaping or < block size)" << std::endl;
                 return std::vector<std::vector<short>>();                
             }
-
+            /*
+              Executa o Clustering
+            */
             KMeans km(codebookSize, maxIterations);
 
             return km.getClusters(blocks, nThreads);
