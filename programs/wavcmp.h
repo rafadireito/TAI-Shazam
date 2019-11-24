@@ -1,8 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <sndfile.hh>
-#include <math.h>
+#include <cmath>
 
+/**
+ * Class responsible for computing the signal-to-noise ratio of a certain audio file.
+ */
 class Wavcmp {
     public:
         static std::vector<short> allSampleFromFile(SndfileHandle sndFileIn);

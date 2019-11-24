@@ -9,12 +9,13 @@
 #include <dirent.h>
 #include <fstream>
 
-/*
-
-*/
+/**
+ * Class responsible for finding the most probable music to which a audio sample belongs,
+ * given a collection of codebooks.
+ */
 class Wavfind {
 private:
-    std::string probableCodebook;
+    std::string probableCodebook = "None";
     double signalNoiseRatio = -std::numeric_limits<double>::infinity();
 public:
     ~Wavfind();

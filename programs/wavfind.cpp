@@ -8,6 +8,11 @@ Wavfind::Wavfind() = default;
 
 Wavfind::~Wavfind() = default;
 
+/**
+ *
+ * @param codebookName is the name of the codebook which represents a music.
+ * @param result is the signal-to-energy ratio used as factor of comparison.
+ */
 void Wavfind::compare(std::string codebookName, double result) {
     if (this -> signalNoiseRatio < result) {
         this -> signalNoiseRatio = result;
@@ -15,43 +20,47 @@ void Wavfind::compare(std::string codebookName, double result) {
     }
 }
 
+/**
+ * Function to retrieve the music name with the highest probability.
+ * @return the name of the most probable music.
+ */
 std::string Wavfind::guessMusic() {
     return this -> probableCodebook;
 }
 
+/**
+ * Function to open a directory and retrieve all the files inside.
+ * @param path is the location of the directory with the collection of codebooks.
+ * @return all the files, that should be codebooks, inside of the directory.
+ */
 std::vector<std::string> Wavfind::open(const std::string& path = ".") {
     DIR*    dir;
     dirent* pdir;
     std::vector<std::string> files;
 
+    if (path.back() != '/' and path != ".") {
+        std::cerr << "Directory is missing the / at the end!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     dir = opendir(path.c_str());
 
-    while ((pdir = readdir(dir))) {
-        files.emplace_back(pdir->d_name);
+    if (dir == nullptr) {
+        std::cerr << "Directory doesn't exist!" << std::endl;
+        exit(EXIT_FAILURE);
     }
+
+    while ((pdir = readdir(dir)))
+        files.emplace_back(pdir->d_name);
 
     return files;
 }
 
-/**
- Used to extract all samples from a sound file
- */
-std::vector<short> Wavcmp::allSampleFromFile(SndfileHandle sndFileIn) {
-    size_t nFrames;
-    std::vector<short> samples(FRAMES_BUFFER_SIZE * sndFileIn.channels());
-    std::vector<short> all_samples;
-
-    while((nFrames = sndFileIn.readf(samples.data(), FRAMES_BUFFER_SIZE)))
-        // copy samples (each frame might have 2 samples, if we are in stereo)
-        for (size_t i = 0; i < nFrames * sndFileIn.channels(); i++)
-            all_samples.push_back(samples.at(i));
-
-    return all_samples;
-}
-
-/**
- Returns the signal energy
- */
+ /**
+  * Function to compute the signal energy of samples.
+  * @param samples represent a set of values of a audio sample block.
+  * @return the signal energy of the samples.
+  */
 double Wavcmp::signalEnergy(const std::vector<short>& samples){
     double totalEnergy = 0;
 
@@ -61,10 +70,12 @@ double Wavcmp::signalEnergy(const std::vector<short>& samples){
     return totalEnergy;
 }
 
-
 /**
-Returns the noise energy
-*/
+ * Function to compute the noise energy between a audio sample block and a codebook block.
+ * @param originalSamples represent a set of values of a audio sample block.
+ * @param modifiedSamples represent a set of values of a codebook block.
+ * @return the noise energy between the originalSamples and the modifiedSamples.
+ */
 double Wavcmp::noiseEnergy(std::vector<short> originalSamples, std::vector<short> modifiedSamples){
     double noiseEnergy = 0;
 
@@ -74,10 +85,12 @@ double Wavcmp::noiseEnergy(std::vector<short> originalSamples, std::vector<short
     return noiseEnergy;
 }
 
-
 /**
-Returns the signal to noise ration of the signal
-*/
+ * Function to compute the signal-to-noise ratio of a signal.
+ * @param signalEnergy of a signal.
+ * @param noiseEnergy of a signal.
+ * @return the signal-to-noise ratio of a signal.
+ */
 double Wavcmp::signalNoiseRatio(double signalEnergy, double noiseEnergy){
     return 10 * log10(signalEnergy/noiseEnergy);
 }
@@ -121,14 +134,14 @@ int main(int argc, char *argv[]) {
 
         if (codebook.is_open()) {
             while (getline(codebook, line)) {
-                std::vector<short> codebookSample (line.begin(), line.end());
+                std::vector<short> codebookBlock (line.begin(), line.end());
                 std::vector<short> block(blockSize * sampleFile.channels());
                 sampleFile.seek(0, SEEK_SET);
 
                 while((readBlockSize = sampleFile.readf(block.data(), blockSize))) {
                     if(readBlockSize == blockSize) {
                         result = wcmp.signalNoiseRatio(wcmp.signalEnergy(block),
-                                wcmp.noiseEnergy(block, codebookSample));
+                                wcmp.noiseEnergy(block, codebookBlock));
                         wf.compare(file, result);
                         sampleFile.seek(-overlappingFactor, SEEK_CUR);
                     }
