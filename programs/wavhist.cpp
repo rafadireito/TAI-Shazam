@@ -3,6 +3,7 @@
 #include <sndfile.hh>
 #include "wavhist.h"
 
+
 using namespace std;
 
 constexpr size_t FRAMES_BUFFER_SIZE = 65536; // Buffer for reading frames
@@ -36,6 +37,9 @@ int main(int argc, char *argv[]) {
 		cerr << "Error: invalid channel requested" << endl;
 		return 1;
 	}
+    
+
+    
 
 	size_t nFrames;
     vector<short> samples(FRAMES_BUFFER_SIZE * sndFile.channels());
@@ -49,6 +53,7 @@ int main(int argc, char *argv[]) {
     
 	//hist.dump(channel);
     hist.dump_mono();
+    hist.displayHistogram();
     
 	return 0;
 }

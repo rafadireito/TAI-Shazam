@@ -5,14 +5,20 @@
 #include <vector>
 #include <map>
 #include <sndfile.hh>
+#include <fstream>
+#include "gnuplot.h"
 
 class WAVHist {
   private:
 	std::vector<std::map<short, size_t>> counts;
     std::map<double, size_t> counts_mono;
+    std::ofstream myfile;
+    
+    
 
   public:
 	WAVHist(const SndfileHandle& sfh) {
+        myfile.open ("results/hist_dump.tsv");
 		counts.resize(sfh.channels());
 	}
 
@@ -40,20 +46,37 @@ class WAVHist {
         }
 	}
 
-	void dump(const size_t channel) const {
-		for(auto [value, counter] : counts[channel])
-            std::cout << value << '\t' << counter << '\n';
+	void dump(const size_t channel)  {
+        for(auto [value, counter] : counts[channel]){
+            //std::cout << value << '\t' << counter << '\n';
+            myfile << value << '\t' << counter << '\n';
+        }
+        myfile.close();
 	}
     
     
-    void dump_mono() const {
+    void dump_mono() {
         // if the file is already in mono, print its histogram
         if(counts.size()== 1)
             dump(0);
         // if file is stereo
-        else
-            for(auto [value, counter] : counts_mono)
+        else{
+            for(auto [value, counter] : counts_mono){
                 std::cout << value << '\t' << counter << '\n';
+                myfile << value << '\t' << counter << '\n';
+            }
+            myfile.close();
+        }
+        
+    }
+    
+    void displayHistogram(){
+        GnuplotPipe gp;
+        gp.sendLine("set style data histograms");
+        gp.sendLine("set style fill solid");
+        gp.sendLine("set ylabel 'Quantidade de Amostras'");
+        gp.sendLine("set xlabel 'Amplitude da Amostra'");
+        gp.sendLine("plot 'results/hist_dump.tsv' using 2:xtic(1)  title 'Histograma - Quantidade de Amostras por Amplitude'");
     }
 };
 

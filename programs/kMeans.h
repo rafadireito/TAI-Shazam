@@ -4,11 +4,6 @@
 #include <pthread.h>
 #include <mutex>
 
-struct updateData {
-   size_t start;
-   size_t end;
-};
-
 class KMeans{
 
 
