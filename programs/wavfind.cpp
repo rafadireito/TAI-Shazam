@@ -9,7 +9,7 @@ Wavfind::Wavfind() = default;
 Wavfind::~Wavfind() = default;
 
 /**
- *
+ * Function to compare the given result with the result of, so far, the most probable codebook.
  * @param codebookName is the name of the codebook which represents a music.
  * @param result is the signal-to-energy ratio used as factor of comparison.
  */
