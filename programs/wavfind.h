@@ -15,7 +15,7 @@
 class Wavfind {
 private:
     std::string probableCodebook;
-    double signalNoiseRatio{};
+    double signalNoiseRatio = -std::numeric_limits<double>::infinity();
 public:
     ~Wavfind();
 

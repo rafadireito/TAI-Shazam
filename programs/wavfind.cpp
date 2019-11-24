@@ -9,7 +9,7 @@ Wavfind::Wavfind() = default;
 Wavfind::~Wavfind() = default;
 
 void Wavfind::compare(std::string codebookName, double result) {
-    if (this -> signalNoiseRatio > result) {
+    if (this -> signalNoiseRatio < result) {
         this -> signalNoiseRatio = result;
         this -> probableCodebook = std::move(codebookName);
     }
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
     size_t blockSize = 5000;
     float overlappingFactor = 0.5;
     Wavfind wf;
-    Wavcmp wc;
+    Wavcmp wcmp;
 
     std::vector<std::string> files = wf.open(argv[argc-2]);
     files.erase(files.begin(), files.begin()+2);
@@ -115,28 +115,27 @@ int main(int argc, char *argv[]) {
 
     for (const auto & file : files) {
         double result = 0;
-        double numBlocks = 0;
-        size_t readBlockSize = 0;
+        size_t readBlockSize;
         std::string line;
         std::ifstream codebook (argv[argc-2] + file);
-        sampleFile.seek(0, SEEK_SET);
 
         if (codebook.is_open()) {
             while (getline(codebook, line)) {
                 std::vector<short> codebookSample (line.begin(), line.end());
                 std::vector<short> block(blockSize * sampleFile.channels());
+                sampleFile.seek(0, SEEK_SET);
 
                 while((readBlockSize = sampleFile.readf(block.data(), blockSize))) {
                     if(readBlockSize == blockSize) {
-                        numBlocks += 1;
-                        result += wc.signalNoiseRatio(wc.signalEnergy(block), wc.noiseEnergy(block, codebookSample));
-                        sampleFile.seek( -overlappingFactor, SEEK_CUR);
+                        result = wcmp.signalNoiseRatio(wcmp.signalEnergy(block),
+                                wcmp.noiseEnergy(block, codebookSample));
+                        wf.compare(file, result);
+                        sampleFile.seek(-overlappingFactor, SEEK_CUR);
                     }
                 }
             }
 
             codebook.close();
-            wf.compare(file, result / numBlocks);
         }
     }
 
