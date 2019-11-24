@@ -13,7 +13,7 @@ SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BASE_DIR}/executables)
 add_executable (wavcp wavcp.cpp)
 target_link_libraries (wavcp sndfile)
 
-add_executable (wavhist wavhist.cpp)
+add_executable (wavhist wavhist.cpp gnuplot.h)
 target_link_libraries (wavhist sndfile)
 
 add_executable (wavquant wavquant)
@@ -27,3 +27,4 @@ target_link_libraries (wavcb sndfile)
 
 add_executable (wavfind wavfind.cpp)
 target_link_libraries (wavfind sndfile)
+
