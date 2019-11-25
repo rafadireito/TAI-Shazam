@@ -3,7 +3,7 @@
 To build, go inside the programs folder and do:  
         make
 
-To test:
+To test:  
         ./executables/wavhist <input file> <channel>  
           
         ./executables/wavcp <input file> <output file>  
