@@ -1,6 +1,6 @@
 # TAI-Shazam
 
-To build, go inside the programs folder and do:  
+To build, go inside the programs folder and execute:  
         make
 
 To test:  
