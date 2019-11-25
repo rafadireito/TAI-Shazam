@@ -1,9 +1,6 @@
 #include "wavfind.h"
 #include "wavcmp.h"
 
-
-constexpr size_t FRAMES_BUFFER_SIZE = 65536; // Buffer for reading frames
-
 Wavfind::Wavfind() = default;
 
 Wavfind::~Wavfind() = default;
@@ -14,7 +11,7 @@ Wavfind::~Wavfind() = default;
  * @param result is the signal-to-energy ratio used as factor of comparison.
  */
 void Wavfind::compare(std::string codebookName, double result) {
-    if (this -> signalNoiseRatio < result) {
+    if (result > this -> signalNoiseRatio) {
         this -> signalNoiseRatio = result;
         this -> probableCodebook = std::move(codebookName);
     }
@@ -51,16 +48,65 @@ std::vector<std::string> Wavfind::open(const std::string& path = ".") {
     }
 
     while ((pdir = readdir(dir)))
-        files.emplace_back(pdir->d_name);
+        if (strncmp(pdir->d_name, ".", 1) != 0 and strncmp(pdir->d_name, "..", 2) != 0)
+            files.emplace_back(pdir->d_name);
 
     return files;
 }
 
- /**
-  * Function to compute the signal energy of samples.
-  * @param samples represent a set of values of a audio sample block.
-  * @return the signal energy of the samples.
-  */
+/**
+ * Function to retrieve all the blocks from the codebook file.
+ * @param codebook is the file which contains the blocks to be compared with the sample blocks.
+ * @param blockSize is the size of each block inside of the codebook file.
+ * @return all the blocks inside the codebook file.
+ */
+std::vector<std::vector<short>> Wavfind::getCodebookBlocks(std::ifstream & codebook, size_t blockSize) {
+    short val;
+    std::string value;
+    std::vector<short> codebookBlock;
+    std::vector<std::vector<short>> codebookBlocks;
+
+    if (codebook.is_open()) {
+        while (getline(codebook, value, ' ')) {
+            std::stringstream sstream(value);
+            sstream >> val;
+            codebookBlock.push_back(val);
+
+            if (codebookBlock.size() == blockSize) {
+                codebookBlocks.push_back(codebookBlock);
+                codebookBlock.clear();
+            }
+        }
+
+        codebook.close();
+    }
+
+    return codebookBlocks;
+}
+
+/**
+ * Function to retrieve all the blocks from the audio sample file.
+ * @param sampleFile is a sample of an audio file with the .wav extension.
+ * @param blockSize is the size of each block inside of the sample file.
+ * @return all the blocks inside the audio sample file.
+ */
+std::vector<std::vector<short>> Wavfind::getSampleBlocks(SndfileHandle sampleFile, size_t blockSize) {
+    size_t readBlockSize;
+    std::vector<std::vector<short>> blocks;
+    std::vector<short> block(blockSize * sampleFile.channels());
+
+    while((readBlockSize = sampleFile.readf(block.data(), blockSize)))
+        if (readBlockSize == blockSize)
+            blocks.push_back(block);
+
+    return blocks;
+}
+
+/**
+ * Function to compute the signal energy of samples.
+ * @param samples represent a set of values of a audio sample block.
+ * @return the signal energy of the samples.
+ */
 double Wavcmp::signalEnergy(const std::vector<short>& samples){
     double totalEnergy = 0;
 
@@ -96,20 +142,17 @@ double Wavcmp::signalNoiseRatio(double signalEnergy, double noiseEnergy){
 }
 
 int main(int argc, char *argv[]) {
-    if(argc != 3) {
-        std::cerr << "Usage: wavfind <directory with codebooks> <audio sample file>" << std::endl;
+    if(argc != 4) {
+        std::cerr << "Usage: wavfind <directory with codebooks> <audio sample file> <blockSize>" << std::endl;
         return 1;
     }
 
-    size_t blockSize = 5000;
-    float overlappingFactor = 0.5;
+    std::stringstream sstream(argv[argc-1]);
+    size_t blockSize;
+    sstream >> blockSize;
     Wavfind wf;
     Wavcmp wcmp;
-
-    std::vector<std::string> files = wf.open(argv[argc-2]);
-    files.erase(files.begin(), files.begin()+2);
-
-    SndfileHandle sampleFile { argv[argc-1] };
+    SndfileHandle sampleFile { argv[argc-2] };
 
     if(sampleFile.error()) {
         std::cerr << "Error: invalid input file" << std::endl;
@@ -126,30 +169,31 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    std::vector<std::vector<short>> sampleBlocks = wf.getSampleBlocks(sampleFile, blockSize);
+    std::vector<std::string> files = wf.open(argv[argc-3]);
+
     for (const auto & file : files) {
-        double result = 0;
-        size_t readBlockSize;
-        std::string line;
-        std::ifstream codebook (argv[argc-2] + file);
+        double result = 0.0;
+        std::ifstream codebook (argv[argc-3] + file);
+        std::vector<std::vector<short>> codebookBlocks = wf.getCodebookBlocks(codebook, blockSize);
 
-        if (codebook.is_open()) {
-            while (getline(codebook, line)) {
-                std::vector<short> codebookBlock (line.begin(), line.end());
-                std::vector<short> block(blockSize * sampleFile.channels());
-                sampleFile.seek(0, SEEK_SET);
+        for (const auto & sampleBlock : sampleBlocks) {
+            double min_error = -std::numeric_limits<double>::infinity();
 
-                while((readBlockSize = sampleFile.readf(block.data(), blockSize))) {
-                    if(readBlockSize == blockSize) {
-                        result = wcmp.signalNoiseRatio(wcmp.signalEnergy(block),
-                                wcmp.noiseEnergy(block, codebookBlock));
-                        wf.compare(file, result);
-                        sampleFile.seek(-overlappingFactor, SEEK_CUR);
-                    }
-                }
+            for (const auto & codebookBlock : codebookBlocks) {
+                double error = wcmp.signalNoiseRatio(wcmp.signalEnergy(sampleBlock),
+                        wcmp.noiseEnergy(codebookBlock, sampleBlock));
+
+                if (error > min_error)
+                    min_error = error;
             }
 
-            codebook.close();
+            result += min_error;
+            codebook.clear();
+            codebook.seekg(0, std::ios::beg);
         }
+
+        wf.compare(file, result);
     }
 
     std::cout << "I think this is your song: " << wf.guessMusic() << std::endl;

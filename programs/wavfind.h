@@ -8,6 +8,8 @@
 #include <vector>
 #include <dirent.h>
 #include <fstream>
+#include <sstream>
+#include <numeric>
 
 /**
  * Class responsible for finding the most probable music to which a audio sample belongs,
@@ -23,6 +25,10 @@ public:
     Wavfind();
 
     void compare(std::string codebook, double result);
+
+    static std::vector<std::vector<short>> getCodebookBlocks(std::ifstream & codebookPath, size_t blockSize);
+
+    static std::vector<std::vector<short>> getSampleBlocks(SndfileHandle sampleFile, size_t blockSize);
 
     std::string guessMusic();
 
